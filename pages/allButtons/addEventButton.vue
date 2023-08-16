@@ -3,20 +3,23 @@
         <v-sheet class="d-flex">
             <v-sheet>
                 <div class="bord" align="center">
-                    <div class="ma-3">Users</div>
+                    <div class="ma-3" >Users</div>
                     <v-divider></v-divider>
                     <v-btn class="button ma-1" block flat t v-for="use in users_added" :key="use">{{
                         use }}</v-btn>
                     <v-btn flat prepend-icon="mdi-plus" @click="adduserdialog = !adduserdialog" block>add user</v-btn>
                     <v-dialog v-model="adduserdialog" width="500">
                         <v-card>
+
                             <v-toolbar title="Add user"></v-toolbar>
-                            
+                        
+                            <v-toolbar title="Add user" color="indigo"></v-toolbar>
+                            <!-- <label for="meeting members">Meeting members</label> -->
                             <div class="ma-4">
                                 <v-text-field label="user name" v-model="newuser"></v-text-field>
                                 <div class="d-flex justify-space-around ma-4">
-                                    <v-btn @click="addUsr">add user</v-btn>
-                                    <v-btn @click="adduserdialog = false">cancel</v-btn>
+                                    <v-btn @click="addUsr" color="blue">add user</v-btn>
+                                    <v-btn @click="adduserdialog = false" color="red">cancel</v-btn>
                                 </div>
                             </div>
                         </v-card>
@@ -28,11 +31,16 @@
                 <v-col cols="1" style="min-width: 100px; max-width: 100%;" class="ma-4">
                     <v-sheet class="d-flex align-self-start justify-space-around">
 
-                        <v-btn class="mx-4" @click="dialog = !dialog"> add event </v-btn>
+                        <v-btn class="mx-4" @click="dialog = !dialog" color="cyan darken-2" variant="elevated"> add event </v-btn>
                         <v-dialog v-model="dialog" width="500">
                             <v-card>
+
                                 <v-toolbar title="Add meeting"></v-toolbar>
                                
+
+                                <v-toolbar title="Add meeting" color="indigo"></v-toolbar>
+                                <!-- <label for="meeting members">Meeting members</label> -->
+
                                 <div class="ma-4">
                                     <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
                                     <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
@@ -43,18 +51,18 @@
                                     <v-text-field type="time" label="start time" v-model="startTime" ></v-text-field>
                                     <v-text-field label="duration" v-model.number="duration"></v-text-field>
                                     <div class="d-flex justify-space-around ma-4">
-                                        <v-btn @click="addEvt">add event</v-btn>
-                                        <v-btn>cancel</v-btn>
+                                        <v-btn @click="addEvt" color="blue">add event</v-btn>
+                                        <v-btn color="red">cancel</v-btn>
                                     </div>
                                 </div>
                             </v-card>
                         </v-dialog>
 
 
-                        <v-btn class="mx-4" @click="suggestDialog = !suggestDialog">suggest event</v-btn>
+                        <v-btn class="mx-4" @click="suggestDialog = !suggestDialog" color="cyan darken-2" variant="elevated">suggest event</v-btn>
                         <v-dialog v-model="suggestDialog" width="500">
                             <v-card>
-                                <v-toolbar title="suggest meeting"></v-toolbar>
+                                <v-toolbar title="suggest meeting" color="indigo"></v-toolbar>
                                 <!-- <label for="meeting members">Meeting members</label> -->
                                 <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
                                 <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
@@ -62,8 +70,8 @@
                                 <v-text-field label="date" v-model="date"></v-text-field>
                                 <v-text-field label="duration" v-model.number="duration"></v-text-field>
                                 <div class="d-flex justify-space-around ma-4">
-                                    <v-btn @click="suggestEvt">suggest event</v-btn>
-                                    <v-btn>cancel</v-btn>
+                                    <v-btn @click="suggestEvt" color="blue">suggest event</v-btn>
+                                    <v-btn color="red">cancel</v-btn>
                                 </div>
                             </v-card>
                         </v-dialog>
@@ -80,27 +88,36 @@
                     <v-sheet class="ma-2 pa-2" min-width="600">
                         <div v-for="meet in all_meetings" :key="meet.id">
 
+
                            
                             <v-card v-show="toShow(meet) && toShowbydate(meet)" class="ma-5" style="max-width:100%" variant="outlined">
                                 <v-card-item>
+
+                            <!-- <v-card > -->
+                            <v-card v-show="toShow(meet)" class="ma-5" style="max-width:100%" outlined color="#BBDEFB" variant="elevated" >
+                                <v-card-item >
+
                                     <div>
-                                        <div class="text-overline mb-1">
-                                            {{ meet.date }}
-                                        </div>
                                         <div class="text-h6 mb-1">
+                                            <span class="font-weight-bold">Title:</span>
                                             {{ meet.title }}
                                         </div>
-                                        <div class="text-caption">Starting time: {{ printTime(meet.start) }},&nbsp; Ending
-                                            time: {{ printTime(meet.end) }}</div>
-                                        <div class="text-subtitle-1">{{ printnames(meet.users) }}</div>
+                                        <div>
+                                            <span class="font-weight-bold">Date:</span>
+                                            {{ meet.date }}
+                                        </div>
+                        
+                                        <div class><span class="font-weight-bold">Starting time:</span> {{ printTime(meet.start) }},&nbsp; <span class="font-weight-bold">Ending
+                                            time: </span>{{ printTime(meet.end) }}</div>
+                                        <div class="text-subtitle-1"><span class="font-weight-bold">Participants: </span>{{ printnames(meet.users) }}</div>
                                     </div>
                                 </v-card-item>
 
                                 <v-card-actions>
-                                    <v-btn variant="outlined">
+                                    <v-btn color="#00897B" variant="elevated">
                                         Modify
                                     </v-btn>
-                                    <v-btn variant="outlined">
+                                    <v-btn color="primary" variant="elevated">
                                         Delete
                                     </v-btn>
                                 </v-card-actions>
@@ -630,5 +647,9 @@ export default {
 .button {
     justify-content: center;
     min-width: 95%;
+
 }
+
+
+
 </style>
