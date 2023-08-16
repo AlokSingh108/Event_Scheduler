@@ -11,7 +11,7 @@
                     <v-dialog v-model="adduserdialog" width="500">
                         <v-card>
                             <v-toolbar title="Add user"></v-toolbar>
-                            <!-- <label for="meeting members">Meeting members</label> -->
+                            
                             <div class="ma-4">
                                 <v-text-field label="user name" v-model="newuser"></v-text-field>
                                 <div class="d-flex justify-space-around ma-4">
@@ -32,13 +32,13 @@
                         <v-dialog v-model="dialog" width="500">
                             <v-card>
                                 <v-toolbar title="Add meeting"></v-toolbar>
-                                <!-- <label for="meeting members">Meeting members</label> -->
+                               
                                 <div class="ma-4">
                                     <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
                                     <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
                                         chips></v-combobox>
                                     <v-text-field type="date" label="Date" v-model="date"></v-text-field>
-                                    <!-- <v-date-picker></v-date-picker> -->
+                                 
 
                                     <v-text-field type="time" label="start time" v-model="startTime" ></v-text-field>
                                     <v-text-field label="duration" v-model.number="duration"></v-text-field>
@@ -76,11 +76,12 @@
 
                 <v-col cols="1" style="min-width: 100px; max-width: 100%;" class="flex-grow-1 flex-shrink-0">
 
+                    <!-- showing all cards in a big sheet   -->
                     <v-sheet class="ma-2 pa-2" min-width="600">
                         <div v-for="meet in all_meetings" :key="meet.id">
 
-                            <!-- <v-card > -->
-                            <v-card v-show="toShow(meet)" class="ma-5" style="max-width:100%" variant="outlined">
+                           
+                            <v-card v-show="toShow(meet) && toShowbydate(meet)" class="ma-5" style="max-width:100%" variant="outlined">
                                 <v-card-item>
                                     <div>
                                         <div class="text-overline mb-1">
@@ -104,9 +105,7 @@
                                     </v-btn>
                                 </v-card-actions>
                             </v-card>
-
-                            <!-- </v-card> -->
-
+                           
                         </div>
                     </v-sheet>
                 </v-col>
@@ -164,7 +163,7 @@ export default {
         const startTime = ref(null);
         const start = ref(null);
         const duration = ref(null);
-        // const end = ref(start.value + duration.value);
+        
         const date = ref(null);
         const users_added = ref([]);
         const firestore = setupFirebase();
@@ -177,6 +176,7 @@ export default {
         const showdate = ref(null);
         const heading = ref(null);
         let id = 0;
+        let currdate = "2023-08-11";
 
 
         onSnapshot(added_users, (snapshot) => {
@@ -215,13 +215,13 @@ export default {
 
         async function addEvt() {
             let count = 0;
-            // console.log(userAdded.value);
+            
             start.value=getTime(startTime.value);
             userAdded.value.sort();
             await getDocs(added_users).then((snapshot) => {
                 snapshot.docs.forEach((doc) => {
                     for (let i = 0; i < userAdded.value.length; i++) {
-                        // console.log(doc.id, userAdded.value[i]);
+                        
                         if (doc.id == userAdded.value[i]) {
                             count += 1;
                         }
@@ -238,7 +238,7 @@ export default {
                     let s = -1;
                     const uname = doc(added_users, userAdded.value[i]);
                     const datewise = collection(uname, "date");
-                    // console.log(date.value);
+                    
                     const inter = [];
                     await getDocs(datewise).then((snapshot) => {
                         snapshot.docs.forEach((doc) => {
@@ -251,7 +251,6 @@ export default {
                         });
                     });
 
-                    // console.log(inter);
 
                     inter.sort(function (a, b) {
                         return a.start - b.start;
@@ -315,7 +314,7 @@ export default {
                                 console.log("failure in adding");
                             });
                         }
-                    // console.log("yes", count, start, end, userAdded, date, duration);
+                    
                 } else {
                     console.log("failure due to unavailability of time");
                 }
@@ -349,24 +348,14 @@ export default {
         }
         
         async function suggestEvt() {
-            //   const q= new Queue();
-            //   const q1= new Queue();
-            //   q.enqueue(7);
-            //   q1.enqueue(8);
-            //   console.log(q);
-            //   arr.push(q);
-            //   arr.push(q1);
-            //   console.log(arr);
             
             start.value=getTime(startTime.value);
             let intervals = [];
             for (let i = 0; i < userAdded.value.length; i++) {
-                // const q=new;
+                
                 const d = doc(added_users, userAdded.value[i]);
                 const c = collection(d, "date");
-                // console.log(user,date.value,c);
-
-                // let s=0;
+                
                 const inter = [];
                 await getDocs(c).then((snapshot) => {
                     snapshot.docs.forEach((doc) => {
@@ -382,7 +371,7 @@ export default {
                 inter.sort(function (a, b) {
                     return a.start - b.start;
                 });
-                // console.log(inter);
+                
 
                 let s = 0;
                 const q = new Queue();
@@ -402,27 +391,14 @@ export default {
                     });
                 }
                 intervals.push(q);
-                // q.enqueue({
-                //     start: s,
-                //     end: doc.data().start,
-                // });
-                // s = doc.data().end;
-                // if (s < 1440) {
-                //   q.enqueue({
-                //     start: s,
-                //     end: 1440,
-                //   });
-                // }
-                // console.log(q);
-                // intervals.push(q);
             }
-            // console.log(intervals);
+            
             while (checkNotEmpty(intervals)) {
                 let fmax = 0,
                     fmin = 1440,
                     lmax = 0,
                     lmin = 1440;
-                // console.log(intervals[0].peek());
+                
                 for (let i = 0; i < intervals.length; i++) {
                     fmax = Math.max(fmax, intervals[i].peek().start);
                     fmin = Math.min(fmin, intervals[i].peek().start);
@@ -454,36 +430,9 @@ export default {
             return;
         }
 
-        // async function showEvt(use) {
-        //     if (show.value == true) {
-        //         show.value = false;
-        //         return;
-        //     }
-        //     // const admin = require("firebase-admin");
-        //     // const db = admin.firestore();
-
-        //     // db.listCollections()
-        //     //     .then(snapshot => {
-        //     //         snapshot.forEach(snaps => {
-        //     //             console.log(snaps["_queryOptions"].collectionId); // LIST OF ALL COLLECTIONS
-        //     //         })
-        //     //     })
-        //     //     .catch(error => console.error(error));
-        //     const all_meetings = [];
-        //     const test = doc(added_users, use);
-
-        //     // await getCollections(test)
-        //     //     .then((snapshot)=>{
-        //     //         snapshot.collection.forEach((col)=>{
-        //     //             console.log(col);
-        //     //         })
-        //     //     })
-
-        // }
+        
         const all_meetings = ref([]);
         onSnapshot(added_users, (snapshot) => {
-            // console.log(users_added.value);
-            // console.log(all_meetings.value);
             console.log("yes entered")
 
             for (let i = 0; i < users_added.value.length; i++) {
@@ -514,6 +463,7 @@ export default {
             console.log("not captured",error);
         })
 
+        // to show the card date wise -- ORIGINAL ONE
         function toShow(meet) {
             // console.log(meet,"yes");
             if (meet.date == showbydate.value || showbydate.value == null) {
@@ -529,6 +479,45 @@ export default {
             }
         }
 
+
+        // new changes to show acc to input date
+
+        // computer current date and time taken
+        var today = new Date();
+        console.log(today);
+        currdate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var currtime = today.getHours() + ":" + today.getMinutes()
+        
+
+        // making currdate in proper format to compare 
+        if(currdate[5] != '0' && currdate[6] == '-'){
+            currdate = currdate.split('');
+            currdate.splice(5, 0, '0');
+            currdate = currdate.join('');
+        }
+
+        if(currdate[8] != '0' && currdate.length == 9){
+            currdate = currdate.split('');
+            currdate.splice(8, 0, '0');
+            currdate = currdate.join('');
+        }
+        
+
+        // toShowbydate function to show the meetings according to the selected date 
+        
+        function toShowbydate(meet) {
+            // console.log(meet,"yes");
+            // currdate = new Date();
+            console.log(fetchTime(meet.start));
+            console.log(currdate);
+            if ((meet.date == currdate && fetchTime(meet.start) > currtime) || (meet.date > currdate)) {    
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
         function printnames(users) {
             let names = users[0][0].toUpperCase() + users[0].slice(1);
             for (let i = 1; i < users.length; i++) {
@@ -536,6 +525,7 @@ export default {
             }
             return names;
         }
+
 
         function printTime(time) {
             let min = time % 60;
@@ -568,6 +558,16 @@ export default {
             return newhr + ":" + newmin + " PM"
         }
 
+        // to get time in 24hrs format to be used by toShowbydate function 
+        function fetchTime(time) {
+            let min = time % 60;
+            let hr = Math.floor(time /60);
+            let newhr = hr; 
+            let newmin = min;
+            return newhr + ":" + newmin;
+        }
+
+        
         function getTime(time) {
             if(time==null){
                 return null;
@@ -600,6 +600,8 @@ export default {
             printTime,
             getTime,
             startTime,
+            toShowbydate,
+            fetchTime,
         };
     },
     data() {
@@ -609,12 +611,6 @@ export default {
     },
 
     watch: {
-        // dialog(val) {
-        //     console.log(val);
-        // },
-        // userAdded(val){
-        //   console.log(val);
-        // }
         start(val){
             console.log(val);
         }
