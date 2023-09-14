@@ -1,5 +1,6 @@
 <template>
     <div>
+<!-- <v-btn @click="console.log(typeof(selection), selection)">Show selection</v-btn> -->
         <v-sheet class="d-flex">
             <v-sheet>
                 <div class="bord" align="center">
@@ -76,11 +77,11 @@
 
                 <v-col cols="1" style="min-width: 100px; max-width: 100%;" class="flex-grow-1 flex-shrink-0">
 
-                    <v-sheet class="ma-2 pa-2" min-width="600">
+                    <v-sheet class="ma-2 pa-2" min-width="400">
                         <div v-for="meet in all_meetings" :key="meet.id">
 
                             <!-- <v-card > -->
-                            <v-card v-show="toShow(meet) && toShowbydate(meet)" class="ma-5" style="max-width:100%" outlined color="#BBDEFB" variant="elevated" >
+                            <v-card v-show="toShow(meet) && toShowbydate(meet) && toShowByCalender(meet) " class="ma-5" style="max-width:100%" outlined color="#BBDEFB" variant="elevated" >
                                 <v-card-item >
                                     <div>
                                         <div class="text-h6 mb-1">
@@ -115,7 +116,10 @@
                 </v-col>
 
             </v-sheet>
-            <v-sheet max-width="200">calendar</v-sheet>
+            <v-sheet class="ma-3" width="500">
+
+                <calenDar />
+            </v-sheet>
             <div type="date"></div>
         </v-sheet>
     </div>
@@ -125,8 +129,18 @@
 import { addDoc, collection, doc, getDocs, setDoc, onSnapshot } from "firebase/firestore";
 
 import { setupFirebase } from "../../composables/firebasesetup.js";
+
+import calenDar from "./calendar.vue";
+
+import {provide} from 'vue'
+
+
+
 export default {
     name: "addEventButton",
+    components: {
+        calenDar,
+    },
     async setup() {
         class Queue {
             constructor() {
@@ -161,6 +175,9 @@ export default {
                 return this.items;
             }
         }
+
+        const selection = ref(null);
+        provide('selection', selection)
         const dialog = ref(false);
         const suggestDialog = ref(false);
         const userAdded = ref([]);
@@ -180,6 +197,9 @@ export default {
         const showdate = ref(null);
         const heading = ref(null);
         let id = 0;
+        let currdate = "2023-08-11";
+        let dateStr = ref(null);
+        provide('dateStr', dateStr)
 
 
         onSnapshot(added_users, (snapshot) => {
@@ -405,7 +425,19 @@ export default {
                     });
                 }
                 intervals.push(q);
-                
+                // q.enqueue({
+                //     start: s,
+                //     end: doc.data().start,
+                // });
+                // s = doc.data().end;
+                // if (s < 1440) {
+                //   q.enqueue({
+                //     start: s,
+                //     end: 1440,
+                //   });
+                // }
+                // console.log(q);
+                // intervals.push(q);
             }
             // console.log(intervals);
             while (checkNotEmpty(intervals)) {
@@ -445,11 +477,34 @@ export default {
             return;
         }
 
-        
+        // async function showEvt(use) {
+        //     if (show.value == true) {
+        //         show.value = false;
+        //         return;
+        //     }
+        //     // const admin = require("firebase-admin");
+        //     // const db = admin.firestore();
+
+        //     // db.listCollections()
+        //     //     .then(snapshot => {
+        //     //         snapshot.forEach(snaps => {
+        //     //             console.log(snaps["_queryOptions"].collectionId); // LIST OF ALL COLLECTIONS
+        //     //         })
+        //     //     })
+        //     //     .catch(error => console.error(error));
+        //     const all_meetings = [];
+        //     const test = doc(added_users, use);
+
+        //     // await getCollections(test)
+        //     //     .then((snapshot)=>{
+        //     //         snapshot.collection.forEach((col)=>{
+        //     //             console.log(col);
+        //     //         })
+        //     //     })
+
+        // }
         const all_meetings = ref([]);
         onSnapshot(added_users, (snapshot) => {
-            // console.log(users_added.value);
-            // console.log(all_meetings.value);
             console.log("yes entered")
 
             for (let i = 0; i < users_added.value.length; i++) {
@@ -495,19 +550,12 @@ export default {
             }
         }
 
-        // 2023-08-16
-        // 15:04
-        // new changes to show acc to input date
-
-        // computer current date and time taken
         var today = new Date();
         console.log(today);
-        var currdate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        currdate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
         var currtime = today.getHours() + ":" + today.getMinutes();
-        
-
-        // making currdate in proper format to compare 
-        if(currdate[5] != '0' && currdate[6] == '-'){
+        // making currdate in proper format to compare
+                if(currdate[5] != '0' && currdate[6] == '-'){
             currdate = currdate.split('');
             currdate.splice(5, 0, '0');
             currdate = currdate.join('');
@@ -518,19 +566,51 @@ export default {
             currdate.splice(8, 0, '0');
             currdate = currdate.join('');
         }
-        
 
-        // toShowbydate function to show the meetings according to the selected date 
-        
+
+        // toShowbydate function to show the meetings according to the selected date
         function toShowbydate(meet) {
             // console.log(meet,"yes");
             // currdate = new Date();
             console.log(fetchTime(meet.start));
             console.log(currdate);
-            if ((meet.date == currdate && fetchTime(meet.start) > currtime) || (meet.date > currdate)) {    
-                return true;
+            if ((meet.date == currdate && fetchTime(meet.start) > currtime) || (meet.date > currdate)) {
+                    return true;
             }
             else {
+                return false;
+            }
+        }
+
+        // console.log("selectedDate variable = ",selectedDate);
+        // selectedDate = selectedDate.getFullYear()+'-'+(selectedDate.getMonth()+1)+'-'+selectedDate.getDate();
+
+        // if(selectedDate[5] != '0' && selectedDate[6] == '-'){
+        //     selectedDate = selectedDate.split('');
+        //     selectedDate.splice(5, 0, '0');
+        //     selectedDate = selectedDate.join('');
+        // }
+
+        // if(selectedDate[8] != '0' && selectedDate.length == 9){
+        //     selectedDate = selectedDate.split('');
+        //     selectedDate.splice(8, 0, '0');
+        //     selectedDate = selectedDate.join('');
+        // }
+
+        function toShowByCalender(meet) {
+            console.log("selection: : "+selection.value);
+            console.log("datestr: : "+dateStr.value + " " + typeof(dateStr));
+            console.log("meet date: : "+meet.date.toString() + typeof(meet.date));
+        //     // currdate = new Date();
+        //     console.log(fetchTime(meet.start));
+            console.log("in calender function filter",meet.date);
+            // let s = meet.date.toString();
+            if(dateStr.value == null)
+                return true;
+            if (dateStr.value != null && meet.date == dateStr.value) {
+                    return true;
+            }
+             else if(dateStr.value != null && meet.date != dateStr.value){
                 return false;
             }
         }
@@ -575,14 +655,14 @@ export default {
             return newhr + ":" + newmin + " PM"
         }
 
-        // to get time in 24hrs format to be used by toShowbydate function 
         function fetchTime(time) {
             let min = time % 60;
             let hr = Math.floor(time /60);
-            let newhr = hr; 
+            let newhr = hr;
             let newmin = min;
             return newhr + ":" + newmin;
         }
+
 
         function getTime(time) {
             if(time==null){
@@ -616,9 +696,10 @@ export default {
             printTime,
             getTime,
             startTime,
-            toShowbydate,
-            fetchTime,
-
+            currdate,
+            toShowbydate, selection,
+            toShowByCalender,
+            dateStr
         };
     },
     data() {
