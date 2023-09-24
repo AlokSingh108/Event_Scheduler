@@ -79,7 +79,7 @@ export default {
         // const colorVar = ref('red')
         var today = new Date();
         let currdate = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
-        console.log(currdate);
+        // console.log(currdate);
 
         function isLeapYear(year) {
             return (
