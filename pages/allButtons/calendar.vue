@@ -1,48 +1,52 @@
 <template>
     <div>
-        <div class="calendar">
-            <div class="calendar-header">
-                <!-- <span class="month-picker" id="month-picker">{{ month }}</span> -->
-                <div class="year-picker">
-                    <span class="year-change" id="prev-year">
-                        <!-- <pre @click="nextMonth()"> {{ prevArrow }} </pre> -->
-                    </span>
-                    <!-- <span id="year">{{year}}</span> -->
-                    <span class="month-picker" id="month-picker">{{ month }}</span>
-                    <span class="year-change" id="next-year">
-                        <!-- <pre @click="prevMonth()">{{ nextArrow }}</pre> -->
-                    </span>
+        <v-card width="320px" elevation="12">
 
-                    <span id="year">{{ year }}</span>
+            <div class="calendar">
+                <div class="calendar-header">
+                    <!-- <span class="month-picker" id="month-picker">{{ month }}</span> -->
+                    <div class="year-picker">
+                        <span class="year-change" id="prev-year">
+                            <!-- <pre @click="nextMonth()"> {{ prevArrow }} </pre> -->
+                        </span>
+                        <!-- <span id="year">{{year}}</span> -->
+                        <span class="month-picker" id="month-picker">{{ month }}</span>
+                        <span class="year-change" id="next-year">
+                            <!-- <pre @click="prevMonth()">{{ nextArrow }}</pre> -->
+                        </span>
 
-                </div>
-            </div>
-            <div class="calendar-body">
-                <div class="calendar-week-day">
-                    <div>Sun</div>
-                    <div>Mon</div>
-                    <div>Tue</div>
-                    <div>Wed</div>
-                    <div>Thu</div>
-                    <div>Fri</div>
-                    <div>Sat</div>
-                </div>
-                <!-- {{ first_day }} -->
-                <div class="calendar-days">
-                    <!-- {{ first_day}} -->
-                    <div v-for="i in first_day" :key="i"></div>
-                    <div v-for="i in 31" :key="i" :id="i + '-' + (monthIndex + 1) + '-' + year"
-                        @click="selectDate(i + '-' + (monthIndex + 1) + '-' + year)"
-                        :class="(selection == `${i + '-' + (monthIndex + 1) + '-' + year}`) ? 'black' : 'white'" >{{ i }}
-                        <!-- :class="selection == `${i + '-' + (monthIndex + 1) + '-' + year}` ? black : white" -->
-                        <span></span><span></span><span></span><span></span>
+                        <span id="year">{{ year }}</span>
+
                     </div>
                 </div>
+                <div class="calendar-body">
+                    <div class="calendar-week-day">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    <!-- {{ first_day }} -->
+                    <div class="calendar-days">
+                        <!-- {{ first_day}} -->
+                        <div v-for="i in first_day" :key="i"></div>
+                        <div v-for="i in 31" :key="i" :id="i + '-' + (monthIndex + 1) + '-' + year"
+                            @click="selectDate(i + '-' + (monthIndex + 1) + '-' + year)"
+                            :class="selection == `${i + '-' + (monthIndex + 1) + '-' + year}` ? 'black' : ((currdate == `${i + '-' + (monthIndex + 1) + '-' + year}`) ? 'today' : 'white')">
+                            {{ i }}
+                            <!-- :class="selection == `${i + '-' + (monthIndex + 1) + '-' + year}` ? black : white" -->
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="month-list"></div>
             </div>
 
-            <div class="month-list"></div>
-        </div>
-
+        </v-card>
     </div>
 </template>
 
@@ -72,7 +76,10 @@ export default {
         ];
         const prevArrow = "<"
         const nextArrow = ">"
-        const colorVar = ref('red')
+        // const colorVar = ref('red')
+        var today = new Date();
+        let currdate = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+        console.log(currdate);
 
         function isLeapYear(year) {
             return (
@@ -96,20 +103,20 @@ export default {
 
 
         function selectDate(date) {
-            if(selection.value == date){
+            if (selection.value == date) {
                 selection.value = null
                 dateStr.value = null
                 return;
             }
-            
-            console.log("selected ", date)
+
+            // console.log("selected ", date)
             selection.value = date;
             dateStr.value = selection.value;
-            if(dateStr.value!=null){
+            if (dateStr.value != null) {
                 const dateArr = dateStr.value.split('-')
-                if(dateArr[0].length == 1)
+                if (dateArr[0].length == 1)
                     dateArr[0] = '0' + dateArr[0];
-                if(dateArr[1].length == 1)
+                if (dateArr[1].length == 1)
                     dateArr[1] = '0' + dateArr[1];
                 dateStr.value = dateArr[2] + '-' + dateArr[1] + '-' + dateArr[0];
             }
@@ -117,8 +124,8 @@ export default {
         const month = ref("");
         const monthIndex = ref(0);
         const year = ref("");
-        
-        
+
+
 
         let days_of_month = [
             31,
@@ -138,13 +145,13 @@ export default {
         // calendar_days.innerHTML = "";
 
         let currDate = new Date();
-        console.log(currDate.getMonth());
+        // console.log(currDate.getMonth());
 
         monthIndex.value = currDate.getMonth();
         month.value = month_names[currDate.getMonth()];
 
         year.value = currDate.getFullYear();
-        console.log(year.value);
+        // console.log(year.value);
 
         const day = new Date(year.value, currDate.getMonth(), 1)
         first_day.value = day.getDay();
@@ -164,8 +171,8 @@ export default {
             nextArrow,
             selectDate,
             selection,
-            dateStr
-       
+            dateStr,
+            currdate
         }
     },
 }
@@ -176,8 +183,8 @@ export default {
     height: max-content;
     width: max-content;
     background-color: var(--bg-main);
-    border-radius: 30px;
-    padding: 20px;
+    /* border-radius: 30px; */
+    padding: 10px;
     position: relative;
     overflow: hidden;
 }
@@ -190,14 +197,14 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 25px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--color-txt);
-    padding: 10px;
+    padding: 5px;
 }
 
 .calendar-body {
-    padding: 10px;
+    padding: 5px;
 }
 
 .calendar-week-day {
@@ -221,14 +228,15 @@ export default {
 }
 
 .calendar-days div {
-    width: 40px;
-    height: 40px;
+    width: 25px;
+    height: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 5px;
     position: relative;
     cursor: pointer;
+    font-size: 13px;
     animation: to-top 1s forwards;
 }
 
@@ -300,7 +308,7 @@ export default {
 .calendar-days div.curr-date:hover {
     background-color: var(--blue);
     color: var(--white);
-    border-radius: 50%;
+    /* border-radius: 50%; */
 }
 
 .calendar-days div.curr-date span {
@@ -309,7 +317,7 @@ export default {
 
 .month-picker {
     padding: 5px 10px;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     cursor: pointer;
 }
 
@@ -359,7 +367,7 @@ export default {
     top: 0;
     left: 0;
     background-color: var(--bg-main);
-    padding: 20px;
+    padding: 5px;
     grid-template-columns: repeat(3, auto);
     gap: 5px;
     display: grid;
@@ -382,8 +390,8 @@ export default {
 
 .month-list>div>div {
     width: 100%;
-    padding: 5px 20px;
-    border-radius: 10px;
+    padding: 5px 10px;
+    /* border-radius: 10px; */
     text-align: center;
     cursor: pointer;
     color: var(--color-txt);
@@ -396,8 +404,9 @@ export default {
 .black {
     color: white;
     font: bold;
-    border: 2px solid black;
-    background-color: rgba(20, 167, 240, 0.904);
+    border: 1px solid black;
+    background-color: grey;
+    border-radius: 50%;
 }
 
 
@@ -405,10 +414,16 @@ export default {
     color: black;
 }
 
-.calendar{
-    /* height: ; */
-    border: 2px solid black;
-    background-color: rgb(187, 222, 251);
+.today {
+    /* color:white;
+    background-color:blue; */
+    border: 1px solid black;
+    border-radius: 50%;
 }
 
+.calendar {
+    /* height: ; */
+    border: 1px solid black;
+    background-color: white;
+}
 </style>

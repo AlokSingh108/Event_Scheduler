@@ -6,8 +6,9 @@
                 <div class="bord" align="center">
                     <div class="ma-3" >Users</div>
                     <v-divider></v-divider>
-                    <v-btn class="button ma-1" block flat t v-for="use in users_added" :key="use">{{
-                        use }}</v-btn>
+                    <div v-for="use in userSort" :key="use.name">
+                        <v-btn class="button ma-1" :variant="use.variant" :color="use.color" @click="addtoSort(use.name)" :append-icon="use.icon">{{ use.name }}</v-btn>
+                    </div>
                     <v-btn flat prepend-icon="mdi-plus" @click="adduserdialog = !adduserdialog" block>add user</v-btn>
                     <v-dialog v-model="adduserdialog" width="500">
                         <v-card>
@@ -77,11 +78,11 @@
 
                 <v-col cols="1" style="min-width: 100px; max-width: 100%;" class="flex-grow-1 flex-shrink-0">
 
-                    <v-sheet class="ma-2 pa-2" min-width="400">
+                    <v-sheet class="ma-2 pa-2" width="600">
                         <div v-for="meet in all_meetings" :key="meet.id">
 
                             <!-- <v-card > -->
-                            <v-card v-show="toShow(meet) && toShowbydate(meet) && toShowByCalender(meet) " class="ma-5" style="max-width:100%" outlined color="#BBDEFB" variant="elevated" >
+                            <v-card v-show="meet.showIt && toShow(meet) && toShowbyname(meet) && toShowbydate(meet) && toShowByCalender(meet) " class="ma-5" style="max-width:100%" outlined color="#BBDEFB" variant="elevated" >
                                 <v-card-item >
                                     <div>
                                         <div class="text-h6 mb-1">
@@ -100,10 +101,30 @@
                                 </v-card-item>
 
                                 <v-card-actions>
-                                    <v-btn color="#00897B" variant="elevated">
+                                    <v-btn color="#00897B" variant="elevated" @click="modifyDialog(meet)">
                                         Modify
                                     </v-btn>
-                                    <v-btn color="primary" variant="elevated">
+                                    <v-dialog v-model="modifydialog" width="500">
+                                <v-card>
+                                    <v-toolbar title="Modify meeting" color="indigo"></v-toolbar>
+                                    <!-- <label for="meeting members">Meeting members</label> -->
+                                    <div class="ma-4">
+                                        <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
+                                        <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
+                                            chips></v-combobox>
+                                        <v-text-field type="date" label="Date" v-model="date"></v-text-field>
+                                        <!-- <v-date-picker></v-date-picker> -->
+
+                                        <v-text-field type="time" label="start time" v-model="startTime" ></v-text-field>
+                                        <v-text-field label="duration" v-model.number="duration"></v-text-field>
+                                        <div class="d-flex justify-space-around ma-4">
+                                            <v-btn color="blue" @click="modifyEvt">Modify event</v-btn>
+                                            <v-btn color="red">cancel</v-btn>
+                                        </div>
+                                    </div>
+                                </v-card>
+                                </v-dialog>
+                                    <v-btn color="primary" variant="elevated" @click="deleteEvt(meet)">
                                         Delete
                                     </v-btn>
                                 </v-card-actions>
@@ -116,7 +137,7 @@
                 </v-col>
 
             </v-sheet>
-            <v-sheet class="ma-3" width="500">
+            <v-sheet class="cal" width="500">
 
                 <calenDar />
             </v-sheet>
@@ -126,7 +147,7 @@
 </template>
 
 <script>
-import { addDoc, collection, doc, getDocs, setDoc, onSnapshot } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, setDoc, onSnapshot, deleteDoc } from "firebase/firestore";
 
 import { setupFirebase } from "../../composables/firebasesetup.js";
 
@@ -192,30 +213,93 @@ export default {
 
         const adduserdialog = ref(false);
         const newuser = ref("");
-        const showbyname = ref(null);
+        const showbyname = ref([]);
         const showbydate = ref(null);
         const showdate = ref(null);
         const heading = ref(null);
         let id = 0;
+        const modifydialog=ref(false);
         let currdate = "2023-08-11";
         let dateStr = ref(null);
         provide('dateStr', dateStr)
+        const userSort = ref([]);
+        let oldmeet,newmeet;
+
+        async function modifyEvt(){
+            
+            deleteEvt(oldmeet);
+            if(await addEvt()==true){
+                return;
+            }
+            heading.value = oldmeet.title;
+            console.log(oldmeet.users);
+            userAdded.value = oldmeet.users;
+            date.value = oldmeet.date;
+            duration.value = oldmeet.end - oldmeet.start;
+            startTime.value = fetchTime(oldmeet.start);
+            addEvt();
+            console.log("old meet readded ", oldmeet);
+            return;
+        }
+
+        function modifyDialog(meet){
+            modifydialog.value=true;
+            heading.value=meet.title;
+            console.log(meet.users);
+            userAdded.value=meet.users;
+            date.value=meet.date;
+            duration.value=meet.end-meet.start;
+            startTime.value= fetchTime(meet.start);
+            oldmeet={
+                title:meet.title,
+                users:meet.users,
+                start:meet.start,
+                end:meet.end,
+                date:meet.date,
+            }
+        }
 
 
-        onSnapshot(added_users, (snapshot) => {
-            snapshot.docs.forEach((doc) => {
-                let count = 0;
-                users_added.value.forEach((u) => {
-                    if (u === doc.id) {
-                        count++;
+
+        function addtoSort(use) {
+            for (let i = 0; i < userSort.value.length; i++) {
+                if (userSort.value[i].name == use && userSort.value[i].variant=='tonal') {
+                    userSort.value[i].variant='outlined';
+                    userSort.value[i].color='black';
+                    userSort.value[i].icon=""
+                    for(let j=0;j<showbyname.value.length;j++){
+                        if(showbyname.value[j]==use){
+                            showbyname.value.splice(j,1);
+                            // console.log(showbyname.value);
+                            return;
+                        }
                     }
-                });
-                if (count == 0) {
-                    users_added.value.push(doc.id);
+                    return;
+                    // userSort.value.name
                 }
-            });
-        })
+                else if(userSort.value[i].name == use){
+                    userSort.value[i].variant = 'tonal';
+                    userSort.value[i].color='blue';
+                    userSort.value[i].icon="mdi-check"
+                    showbyname.value.push(use);
+                    // console.log(showbyname.value);
+                    return;
+                }
+            }
+        }
 
+        await getDocs(added_users)
+            .then((snap)=>{
+                snap.docs.forEach((doc)=>{
+                    users_added.value.push(doc.id);
+                    userSort.value.push({
+                        name:doc.id,
+                        variant:'outlined',
+                        color:'black',
+                        icon:""
+                    })
+                })
+            })
 
         function addUsr() {
             let count = 0;
@@ -236,15 +320,25 @@ export default {
             });
         }
 
+        function getDocID(date, start, end, users){
+            let Id="";
+            Id=date+'-'+start+'-'+end;
+
+            users.forEach((u)=>{
+                Id=Id+'-'+u;
+            })
+
+            return Id;
+
+        }
+
         async function addEvt() {
             let count = 0;
-            // console.log(userAdded.value);
             start.value=getTime(startTime.value);
             userAdded.value.sort();
             await getDocs(added_users).then((snapshot) => {
                 snapshot.docs.forEach((doc) => {
                     for (let i = 0; i < userAdded.value.length; i++) {
-                        // console.log(doc.id, userAdded.value[i]);
                         if (doc.id == userAdded.value[i]) {
                             count += 1;
                         }
@@ -254,6 +348,7 @@ export default {
             if (count != userAdded.value.length) {
                 dialog.value = false;
                 console.log("undefined user");
+                return Promise.resolve(false);
             } else {
                 count = 0;
                 const end = start.value + duration.value;
@@ -261,7 +356,6 @@ export default {
                     let s = -1;
                     const uname = doc(added_users, userAdded.value[i]);
                     const datewise = collection(uname, "date");
-                    // console.log(date.value);
                     const inter = [];
                     await getDocs(datewise).then((snapshot) => {
                         snapshot.docs.forEach((doc) => {
@@ -274,15 +368,14 @@ export default {
                         });
                     });
 
-                    // console.log(inter);
 
                     inter.sort(function (a, b) {
                         return a.start - b.start;
                     });
 
                     for (let j = 0; j < inter.length; j++) {
-                        if (inter[j].start < start) {
-                            s = doc.end;
+                        if (inter[j].start < start.value) {
+                            s = inter[j].end;
                         }
                         else {
                             if (s == -1) {
@@ -292,7 +385,7 @@ export default {
                                 s = 1500;
                                 break;
                             }
-                            else if (inter[j].start - s > end - start) {
+                            else if (inter[j].start - s > end - start.value) {
                                 count++;
                             }
                             s = 1500;
@@ -300,15 +393,18 @@ export default {
                         }
                     }
                     
-                    if (s == -1) {
-                        count += 1;
+                    if (s!=1500) {
+                        if(start.value > s && 1500 - s > end - start.value)
+                            count += 1;
                     }
                 }
                 if (count == userAdded.value.length) {
                     for (let i = 0; i < userAdded.value.length; i++) {
                         const uname = doc(added_users, userAdded.value[i]);
                         const datewise = collection(uname, "date");
-                        addDoc(datewise, {
+                        const docid=getDocID(date.value, start.value, end, userAdded.value);
+                        const idwise=doc(datewise,docid)
+                        setDoc(idwise, {
                             users: userAdded.value,
                             start: start.value,
                             end: end,
@@ -323,9 +419,8 @@ export default {
                                 users:userAdded.value,
                                 title:heading.value,
                                 showIt: true,
-                                id: id
+                                id:docid,
                             })
-                            id++;
                             userAdded.value = [];
                             start.value = null;
                             duration.value = null;
@@ -333,14 +428,18 @@ export default {
                                 dialog.value = false;
                                 heading.value = "";
                                 console.log("Success");
+                                return Promise.resolve(true);
                             })
+
                             .catch(() => {
                                 console.log("failure in adding");
+                                return Promise.resolve(false);
                             });
                         }
                     // console.log("yes", count, start, end, userAdded, date, duration);
                 } else {
                     console.log("failure due to unavailability of time");
+                    return Promise.resolve(false);
                 }
             }
         }
@@ -425,21 +524,8 @@ export default {
                     });
                 }
                 intervals.push(q);
-                // q.enqueue({
-                //     start: s,
-                //     end: doc.data().start,
-                // });
-                // s = doc.data().end;
-                // if (s < 1440) {
-                //   q.enqueue({
-                //     start: s,
-                //     end: 1440,
-                //   });
-                // }
-                // console.log(q);
-                // intervals.push(q);
             }
-            // console.log(intervals);
+
             while (checkNotEmpty(intervals)) {
                 let fmax = 0,
                     fmin = 1440,
@@ -477,32 +563,6 @@ export default {
             return;
         }
 
-        // async function showEvt(use) {
-        //     if (show.value == true) {
-        //         show.value = false;
-        //         return;
-        //     }
-        //     // const admin = require("firebase-admin");
-        //     // const db = admin.firestore();
-
-        //     // db.listCollections()
-        //     //     .then(snapshot => {
-        //     //         snapshot.forEach(snaps => {
-        //     //             console.log(snaps["_queryOptions"].collectionId); // LIST OF ALL COLLECTIONS
-        //     //         })
-        //     //     })
-        //     //     .catch(error => console.error(error));
-        //     const all_meetings = [];
-        //     const test = doc(added_users, use);
-
-        //     // await getCollections(test)
-        //     //     .then((snapshot)=>{
-        //     //         snapshot.collection.forEach((col)=>{
-        //     //             console.log(col);
-        //     //         })
-        //     //     })
-
-        // }
         const all_meetings = ref([]);
         onSnapshot(added_users, (snapshot) => {
             console.log("yes entered")
@@ -523,8 +583,7 @@ export default {
                             }
                             // console.log(count);
                             if (count == all_meetings.value.length) {
-                                all_meetings.value.push({ ...doc.data(), showIt: true, id: id });
-                                id++;
+                                all_meetings.value.push({ ...doc.data(), showIt: true, id: doc.id });
                             }
                         })
                     })
@@ -535,19 +594,23 @@ export default {
             console.log("not captured",error);
         })
 
-        function toShow(meet) {
-            // console.log(meet,"yes");
-            if (meet.date == showbydate.value || showbydate.value == null) {
-                for (let i = 0; i < meet.users.length; i++) {
-                    if (meet.users[i] == showbyname.value || showbyname.value == null) {
-                        return true;
+        function toShowbyname(meet) {
+            if(showbyname.value.length==0){
+                return true;
+            }
+            // console.log(showbyname);
+            let count = 0;
+            for(let i=0;i<showbyname.value.length;i++){
+                for(let j=0;j<meet.users.length;j++){
+                    if(showbyname.value[i]==meet.users[j]){
+                        count++;
                     }
                 }
-                return false;
             }
-            else {
-                return false;
+            if(count == showbyname.value.length){
+                return true;
             }
+            return false;
         }
 
         var today = new Date();
@@ -572,8 +635,8 @@ export default {
         function toShowbydate(meet) {
             // console.log(meet,"yes");
             // currdate = new Date();
-            console.log(fetchTime(meet.start));
-            console.log(currdate);
+            // console.log(fetchTime(meet.start));
+            // console.log(currdate);
             if ((meet.date == currdate && fetchTime(meet.start) > currtime) || (meet.date > currdate)) {
                     return true;
             }
@@ -598,12 +661,12 @@ export default {
         // }
 
         function toShowByCalender(meet) {
-            console.log("selection: : "+selection.value);
-            console.log("datestr: : "+dateStr.value + " " + typeof(dateStr));
-            console.log("meet date: : "+meet.date.toString() + typeof(meet.date));
+            // console.log("selection: : "+selection.value);
+            // console.log("datestr: : "+dateStr.value + " " + typeof(dateStr));
+            // console.log("meet date: : "+meet.date.toString() + typeof(meet.date));
         //     // currdate = new Date();
         //     console.log(fetchTime(meet.start));
-            console.log("in calender function filter",meet.date);
+            // console.log("in calender function filter",meet.date);
             // let s = meet.date.toString();
             if(dateStr.value == null)
                 return true;
@@ -617,6 +680,9 @@ export default {
 
 
         function printnames(users) {
+            if(users.length==0){
+                return "undefined";
+            }
             let names = users[0][0].toUpperCase() + users[0].slice(1);
             for (let i = 1; i < users.length; i++) {
                 names = names + ", " + users[i][0].toUpperCase() + users[i].slice(1);
@@ -673,6 +739,33 @@ export default {
                 return hr*60+min;
         }
 
+        function toShow(meet){
+            if(meet.date == undefined || meet.start == undefined || meet.end == undefined || meet.users == undefined || meet.date == null || meet.start == null || meet.end == null || meet.users == null||meet.date=="" || meet.start == "" || meet.end=="" || meet.users==[]){
+                return false;
+            }
+            // console.log(meet);
+            return true;
+
+        }
+
+        function deleteEvt(meet){
+            console.log(meet);
+            let docid= getDocID(meet.date, meet.start, meet.end, meet.users);
+            console.log(docid);
+            meet.users.forEach((user)=>{
+                const u=doc(added_users,user);
+                const d=collection(u,"date");
+                const deldoc=doc(d,docid);
+                deleteDoc(deldoc);
+                //console.log(deldoc);
+            })
+            all_meetings.value.forEach((m)=>{
+                if(m.id==docid){
+                    m.showIt=false;
+                }
+            })
+        }
+
         return {
             showbyname,
             showbydate,
@@ -689,7 +782,7 @@ export default {
             suggestDialog,
             suggestEvt,
             showdate,
-            toShow,
+            toShowbyname,
             all_meetings,
             printnames,
             heading,
@@ -699,7 +792,14 @@ export default {
             currdate,
             toShowbydate, selection,
             toShowByCalender,
-            dateStr
+            dateStr,
+            addtoSort,
+            userSort,
+            toShow,
+            deleteEvt,
+            modifydialog,
+            modifyDialog,
+            modifyEvt,
         };
     },
     data() {
@@ -735,6 +835,9 @@ export default {
     justify-content: center;
     min-width: 95%;
 
+}
+.cal{
+    margin-top: 100px;
 }
 
 
