@@ -55,14 +55,26 @@
 
                         <v-btn class="mx-4" @click="suggestDialog = !suggestDialog" color="cyan darken-2" variant="elevated">suggest event</v-btn>
                         <v-dialog v-model="suggestDialog" width="500">
-                            <v-card>
+                            <v-card >
                                 <v-toolbar title="suggest meeting" color="indigo"></v-toolbar>
                                 <!-- <label for="meeting members">Meeting members</label> -->
-                                <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
-                                <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
-                                    chips></v-combobox>
+                                <div class="ma-4">
+
+                                    <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
+                                    <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
+                                chips></v-combobox>
+                                <div class="timeSlot pt-2 px-2 ma-2">
+                                    <div class="pa-2">
+                                        <label>Time slot</label>
+
+                                    </div>
+                                    <v-text-field type="time" class="start-end" label="Start" v-model="slotStart"></v-text-field>
+                                    <v-text-field type="time" class="start-end" label="End" v-model="slotEnd"></v-text-field>
+
+                                </div>
                                 <v-text-field label="date" v-model="date"></v-text-field>
                                 <v-text-field label="duration" v-model.number="duration"></v-text-field>
+                            </div>
                                 <div class="d-flex justify-space-around ma-4">
                                     <v-btn @click="suggestEvt" color="blue">suggest event</v-btn>
                                     <v-btn color="red">cancel</v-btn>
@@ -203,8 +215,16 @@ export default {
         const dialog = ref(false);
         const suggestDialog = ref(false);
         const userAdded = ref([]);
+
         const startTime = ref(null);
+
         const start = ref(null);
+
+        const slotStart = ref(null);
+        const varStart = ref(null);
+        const varEnd = ref(null);
+        const slotEnd = ref(null);
+
         const duration = ref(null);
         // const end = ref(start.value + duration.value);
         const date = ref(null);
@@ -481,8 +501,15 @@ export default {
             //   arr.push(q);
             //   arr.push(q1);
             //   console.log(arr);
-            
-            start.value=getTime(startTime.value);
+            varStart.value= getTime(slotStart.value)
+            varEnd.value= getTime(slotEnd.value)
+            // console.log(varStart.value + "to" + varEnd.value)
+
+            if(varEnd.value <= varStart.value){
+                return;
+            }
+
+            // start.value=getTime(startTime.value);
             let intervals = [];
             for (let i = 0; i < userAdded.value.length; i++) {
                 // const q=new;
@@ -508,10 +535,29 @@ export default {
                 });
                 // console.log(inter);
 
-                let s = 0;
+            //     // function 
+            for(let i = 0; i < inter.length; i++){
+                if(inter[i].end < varStart.value || inter[i].start > varEnd.value ){
+                    inter.splice(i, 1);
+                }
+                else if(inter[i].start < varStart.value && inter[i].end > varStart.value){
+                    inter.start = Math.max(varStart.value, inter.start);
+                    inter.end = Math.min(varEnd.value, inter.end)
+                }
+
+                else if(inter[i].start < varEnd.value && inter[i].end > varEnd.value){
+                    inter.start = Math.max(varStart.value, inter.start);
+                    inter.end = Math.min(varEnd.value, inter.end)
+                }
+            }
+
+            // console.log(inter)
+
+                let s = varStart.value
                 const q = new Queue();
                 inter.forEach((item) => {
                     if (s < item.start - 10) {
+                        // console.log("yes"+s+" to "+item.start - 10)
                         q.enqueue({
                             start: s,
                             end: item.start - 10,
@@ -519,20 +565,23 @@ export default {
                     }
                     s = item.end + 10;
                 });
-                if (s < 1440) {
+                if (s < varEnd.value) {
                     q.enqueue({
                         start: s,
-                        end: 1440,
+                        end: varEnd.value,
                     });
                 }
+                // console.log(q.peek());
+
                 intervals.push(q);
             }
 
             while (checkNotEmpty(intervals)) {
-                let fmax = 0,
-                    fmin = 1440,
-                    lmax = 0,
-                    lmin = 1440;
+                // console.log(intervals)
+                let fmax = varStart.value,
+                    fmin = varEnd.value,
+                    lmax = varStart.value,
+                    lmin = varEnd.value;
                 // console.log(intervals[0].peek());
                 for (let i = 0; i < intervals.length; i++) {
                     fmax = Math.max(fmax, intervals[i].peek().start);
@@ -543,6 +592,9 @@ export default {
 
                 if (lmin - fmax >= duration.value) {
                     start.value = fmax;
+                    startTime.value=fetchTime(fmax);
+                    // console.log("founded time "+startTime.value)
+                    
                     addEvt();
                     return;
                 }
@@ -813,6 +865,8 @@ export default {
             modifyEvt,
             showcompleted,
             showbeforedate,
+            slotEnd,
+            slotStart,
         };
     },
     methods: {
@@ -881,9 +935,9 @@ export default {
         // userAdded(val){
         //   console.log(val);
         // }
-        start(val){
-            console.log(val);
-        }
+        // start(val){
+        //     console.log(val);
+        // }
     },
 };
 </script>
@@ -914,5 +968,17 @@ export default {
     background-color: #FFD54F;
 }
 
+.timeSlot{
+    border: 1.5px solid black;
+    /* display: inline-block; */
 
+
+
+}
+.start-end{
+    width:42%;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: inline-block;
+}
 </style>
