@@ -1,6 +1,5 @@
 <template>
-    <div>
-        <!-- <v-btn @click="console.log(typeof(selection), selection)">Show selection</v-btn> -->
+    <div style="background-color: black; height:100vh; width: 100%; ">
         <v-sheet class="d-flex" style="background-color: black; height:100%; width: 100%; ">
             <v-sheet style="background-color: black;">
                 <div class="bord" align="center">
@@ -18,12 +17,12 @@
                         @click="adduserdialog = !adduserdialog">add user</v-btn>
                     <v-dialog v-model="adduserdialog" width="500">
                         <v-card>
-                            <v-toolbar title="Add user" color="indigo"></v-toolbar>
+                            <v-toolbar title="Add user" color="orange"></v-toolbar>
                             <!-- <label for="meeting members">Meeting members</label> -->
                             <div class="ma-4">
-                                <v-text-field label="user name" v-model="newuser"></v-text-field>
+                                <v-text-field label="user name"  v-model="newuser"></v-text-field>
                                 <div class="d-flex justify-space-around ma-4">
-                                    <v-btn @click="addUsr" color="blue">add user</v-btn>
+                                    <v-btn @click="addUsr" color="green">add user</v-btn>
                                     <v-btn @click="adduserdialog = false" color="red">cancel</v-btn>
                                 </div>
                             </div>
@@ -245,13 +244,16 @@ export default {
         const varStart = ref(null);
         const varEnd = ref(null);
         const slotEnd = ref(null);
-
+        
         const duration = ref(null);
         // const end = ref(start.value + duration.value);
         const date = ref(null);
         const users_added = ref([]);
+        const username=inject('username');
         const firestore = setupFirebase();
-        const added_users = collection(firestore, "added_users");
+        const login=collection(firestore,username.value);
+        const all=doc(login,"allmeeting")
+        const added_users = collection(all, "added_users");
 
         const adduserdialog = ref(false);
         const newuser = ref("");
@@ -259,14 +261,14 @@ export default {
         const showbydate = ref(null);
         const showdate = ref(null);
         const heading = ref(null);
-        let id = 0;
         const modifydialog = ref(false);
         let currdate = "2023-08-11";
         let dateStr = ref(null);
         provide('dateStr', dateStr)
         const userSort = ref([]);
-        let oldmeet, newmeet;
-        const showcompleted = ref(false)
+        let oldmeet;
+        const showcompleted = ref(false);
+
 
         async function modifyEvt() {
 
@@ -344,23 +346,35 @@ export default {
                 })
             })
 
-        function addUsr() {
+        async function addUsr() {
+            console.log(newuser);
             let count = 0;
-            getDocs(added_users).then((snapshot) => {
-                snapshot.docs.forEach((doc) => {
-                    if (doc.id == newuser.value) {
-                        count++;
-                    }
-                });
+            await getDocs(added_users)
+                .then((snapshot) => {
+                    snapshot.docs.forEach((doc) => {
+                        if (doc.id == newuser.value) {
+                            count++;
+                        }
+                    });
+                console.log(count);
                 if (count != 0) {
                     console.log("user already exsit, failure");
-                } else {
-                    const a = doc(added_users, newuser.value);
+                } 
+                else{
+                    console.log(added_users);
+                    const a=doc(added_users,newuser.value);
+                    users_added.value.push(newuser.value);
+                    userSort.value.push({
+                        name: newuser.value,
+                        variant: 'tonal',
+                        color: '#00C853',
+                        icon: ""
+                    })
                     setDoc(a, {});
-                    newuser.value = "";
-                    adduserdialog.value = false;
                 }
             });
+            newuser.value = "";
+            adduserdialog.value = false;
         }
 
         function getDocID(date, start, end, users) {
