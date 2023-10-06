@@ -1,4 +1,5 @@
 <template>
+    <toolBar1 @showlogin="$emit('showlogin')"/>
     <div style="background-color: black; height:100vh; width: 100%; ">
         <v-sheet class="d-flex" style="background-color: black; height:100%; width: 100%; ">
             <v-sheet style="background-color: black;">
@@ -180,13 +181,15 @@
 </template>
 
 <script>
-import { addDoc, collection, doc, getDocs, setDoc, onSnapshot, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, onSnapshot, deleteDoc } from "firebase/firestore";
 
 import { setupFirebase } from "../../composables/firebasesetup.js";
 
 import calenDar from "./calendar.vue";
 
-import { provide } from 'vue'
+import { provide, inject } from 'vue';
+
+import toolBar1 from './toolbar.vue';
 
 
 
@@ -194,6 +197,7 @@ export default {
     name: "addEventButton",
     components: {
         calenDar,
+        toolBar1,
     },
     async setup() {
         class Queue {

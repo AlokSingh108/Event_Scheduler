@@ -2,7 +2,7 @@
     <v-app>
         <div >
 
-            <toolBar v-if="!show" @showlogin="showloginpage = true, showsignuppage = false" @showsignup="showloginpage = false, showsignuppage = true"/>
+            <toolBar v-if="!show" @showsignup="showloginpage = false,showsignuppage = true, show=false" @showlogin="showloginpage = true, showsignuppage = false, show = false"/>
             <v-dialog v-model="wrongPass" width="auto">
               <v-card>
 
@@ -71,7 +71,7 @@
                   </div>
                 </form>
               </div>
-            <addEventButton v-if="show"/>
+              <addEventButton v-if="show"  @showlogin="showloginpage = true, showsignuppage = false, show = false" />
             <!-- <addEventButton /> -->
         </div>
     </v-app>
@@ -80,6 +80,7 @@
 <script>
 import toolBar from './toolbar.vue'
 import addEventButton from './allButtons/addEventButton.vue';
+
 import { setupAuth } from "../composables/authsetup.js";
 import {
     signInWithEmailAndPassword,
@@ -90,7 +91,7 @@ import {
     export default {
         components:{
             toolBar,
-            addEventButton
+            addEventButton,
         },
         setup(){
             const show = ref(false);
