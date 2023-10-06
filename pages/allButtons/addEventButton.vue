@@ -1,15 +1,21 @@
 <template>
     <div>
-<!-- <v-btn @click="console.log(typeof(selection), selection)">Show selection</v-btn> -->
-        <v-sheet class="d-flex">
-            <v-sheet>
+        <!-- <v-btn @click="console.log(typeof(selection), selection)">Show selection</v-btn> -->
+        <v-sheet class="d-flex" style="background-color: black; height:100%; width: 100%; ">
+            <v-sheet style="background-color: black;">
                 <div class="bord" align="center">
-                    <div class="ma-3 userhead" > <h3> Users </h3></div>
-                    <v-divider></v-divider>
-                    <div v-for="use in userSort" :key="use.name">
-                        <v-btn class="button ma-1" :variant="use.variant" :color="use.color" @click="addtoSort(use.name)" :append-icon="use.icon">{{ use.name }}</v-btn>
+                    <div class="ma-3 userhead">
+                        <h3> Users </h3>
                     </div>
-                    <v-btn flat prepend-icon="mdi-plus" @click="adduserdialog = !adduserdialog" block>add user</v-btn>
+                    <!-- <v-divider></v-divider> -->
+
+                    <div v-for="use in userSort" :key="use.name">
+                        <v-btn class="button ma-1" :variant="use.variant" :color="use.color" @click="addtoSort(use.name)"
+                            :append-icon="use.icon">{{ use.name }}</v-btn>
+                    </div>
+                    <!-- <v-divider thickness="5" color="dark-green"></v-divider> -->
+                    <v-btn class="button ma-1" variant="text" prepend-icon="mdi-plus"
+                        @click="adduserdialog = !adduserdialog">add user</v-btn>
                     <v-dialog v-model="adduserdialog" width="500">
                         <v-card>
                             <v-toolbar title="Add user" color="indigo"></v-toolbar>
@@ -23,124 +29,141 @@
                             </div>
                         </v-card>
                     </v-dialog>
+
+                </div>
+                <div class="bord">
+                    <v-btn class="ma-3" style="width: 160px;" @click="dialog = !dialog" color="#FFD700" variant="outlined">
+                        add new event </v-btn>
+                    <v-btn class="ma-3" style="width: 160px;" @click="suggestDialog = !suggestDialog" color="#FFD700"
+                        variant="outlined">suggest a event</v-btn>
                 </div>
             </v-sheet>
 
-            <v-sheet class="mx-auto">
-                <v-col cols="1" style="min-width: 100px; max-width: 100%;" class="ma-4">
-                    <v-sheet class="d-flex align-self-start justify-space-around">
+            <v-sheet class="mx-auto" style="background-color: black;">
+                <!-- <v-col cols="1" style="min-width: 100px; max-width: 98%;" class="ma-4"> -->
+                <v-sheet class="d-flex align-self-start justify-space-around" style="background-color: black;">
 
-                        <v-btn class="mx-4" @click="dialog = !dialog" color="cyan darken-2" variant="elevated"> add event </v-btn>
-                        <v-dialog v-model="dialog" width="500">
-                            <v-card>
-                                <v-toolbar title="Add meeting" color="indigo"></v-toolbar>
-                                <!-- <label for="meeting members">Meeting members</label> -->
-                                <div class="ma-4">
-                                    <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
-                                    <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
-                                        chips></v-combobox>
-                                    <v-text-field type="date" label="Date" v-model="date"></v-text-field>
-                                    <!-- <v-date-picker></v-date-picker> -->
+                    <v-dialog v-model="dialog" width="500">
+                        <v-card style="background-color: rgb(221, 216, 216);">
+                            <v-toolbar title="Add Meeting" color="#FFA500" style="color:black;"></v-toolbar>
+                            <!-- <label for="meeting members">Meeting members</label> -->
+                            <div class="ma-4">
+                                <v-text-field label="Meeting Title" v-model="heading" variant="outlined"></v-text-field>
+                                <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
+                                    chips variant="outlined"></v-combobox>
+                                <v-text-field type="date" label="Date" v-model="date" variant="outlined"></v-text-field>
+                                <!-- <v-date-picker></v-date-picker> -->
 
-                                    <v-text-field type="time" label="start time" v-model="startTime" ></v-text-field>
-                                    <v-text-field label="duration" v-model.number="duration"></v-text-field>
-                                    <div class="d-flex justify-space-around ma-4">
-                                        <v-btn @click="addEvt" color="blue">add event</v-btn>
-                                        <v-btn color="red">cancel</v-btn>
-                                    </div>
-                                </div>
-                            </v-card>
-                        </v-dialog>
-
-
-                        <v-btn class="mx-4" @click="suggestDialog = !suggestDialog" color="cyan darken-2" variant="elevated">suggest event</v-btn>
-                        <v-dialog v-model="suggestDialog" width="500">
-                            <v-card >
-                                <v-toolbar title="suggest meeting" color="indigo"></v-toolbar>
-                                <!-- <label for="meeting members">Meeting members</label> -->
-                                <div class="ma-4">
-
-                                    <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
-                                    <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
-                                chips></v-combobox>
-                                <div class="timeSlot pt-2 px-2 ma-2">
-                                    <div class="pa-2">
-                                        <label>Time slot</label>
-
-                                    </div>
-                                    <v-text-field type="time" class="start-end" label="Start" v-model="slotStart"></v-text-field>
-                                    <v-text-field type="time" class="start-end" label="End" v-model="slotEnd"></v-text-field>
-
-                                </div>
-                                <v-text-field label="date" v-model="date"></v-text-field>
-                                <v-text-field label="duration" v-model.number="duration"></v-text-field>
-                            </div>
+                                <v-text-field type="time" label="start time" v-model="startTime" variant="outlined"></v-text-field>
+                                <v-text-field label="duration" v-model.number="duration" variant="outlined"></v-text-field>
                                 <div class="d-flex justify-space-around ma-4">
-                                    <v-btn @click="suggestEvt" color="blue">suggest event</v-btn>
-                                    <v-btn color="red">cancel</v-btn>
+                                    <v-btn @click="addEvt" color="green">add event</v-btn>
+                                    <v-btn color="red" @click="closeall">cancel</v-btn>
                                 </div>
-                            </v-card>
-                        </v-dialog>
-                        <v-dialog v-model="modifydialog" width="500">
-                                    <v-card>
-                                        <v-toolbar title="Modify meeting" color="indigo"></v-toolbar>
-                                        <!-- <label for="meeting members">Meeting members</label> -->
-                                        <div class="ma-4">
-                                            <v-text-field label="Meeting Title" v-model="heading"></v-text-field>
-                                            <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
-                                                chips></v-combobox>
-                                            <v-text-field type="date" label="Date" v-model="date"></v-text-field>
-                                            <!-- <v-date-picker></v-date-picker> -->
-
-                                            <v-text-field type="time" label="start time" v-model="startTime" ></v-text-field>
-                                            <v-text-field label="duration" v-model.number="duration"></v-text-field>
-                                            <div class="d-flex justify-space-around ma-4">
-                                                <v-btn color="blue" @click="modifyEvt">Modify event</v-btn>
-                                                <v-btn color="red">cancel</v-btn>
-                                            </div>
-                                        </div>
-                                    </v-card>
-                                    </v-dialog>
+                            </div>
+                        </v-card>
+                    </v-dialog>
 
 
+                    <v-dialog v-model="suggestDialog" width="500">
+                        <v-card style="background-color: rgb(221, 216, 216);">
+                                <v-toolbar title="Suggest Meeting" color="#FFA500" style="color:black;"></v-toolbar>
+                            <!-- <label for="meeting members">Meeting members</label> -->
+                            <div class="ma-4">
+
+                                <v-text-field label="Meeting Title" v-model="heading" variant="outlined"></v-text-field>
+                                <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple chips
+                                    variant="outlined"></v-combobox>
+                                <div class="bordered-div">
+                                    <v-text-field type="time" class="start-end" label="Start" v-model="slotStart"
+                                        variant="outlined"></v-text-field>
+                                    <v-text-field type="time" class="start-end" label="End" v-model="slotEnd"
+                                        variant="outlined"></v-text-field>
+                                </div>
+                                <v-text-field label="date" v-model="date" type="date" variant="outlined"></v-text-field>
+                                <v-text-field label="duration" v-model.number="duration" variant="outlined"></v-text-field>
+                            </div>
+                            <div class="d-flex justify-space-around ma-4">
+                                <v-btn @click="suggestEvt" color="green">suggest event</v-btn>
+                                <v-btn color="red" @click="closeall">cancel</v-btn>
+                            </div>
+                        </v-card>
+                    </v-dialog>
+                    <v-dialog v-model="modifydialog" width="500">
+                        <v-card style="background-color: rgb(221, 216, 216);">
+                                <v-toolbar title="Modify Meeting" color="#FFA500" style="color:black;"></v-toolbar>
+                            <!-- <label for="meeting members">Meeting members</label> -->
+                            <div class="ma-4">
+                                <v-text-field label="Meeting Title" v-model="heading" variant="outlined"></v-text-field>
+                                <v-combobox v-model="userAdded" :items="users_added" label="Meeting members" multiple
+                                    chips variant="outlined"></v-combobox>
+                                <v-text-field type="date" label="Date" v-model="date" variant="outlined"></v-text-field>
+                                <!-- <v-date-picker></v-date-picker> -->
+
+                                <v-text-field type="time" label="start time" v-model="startTime" variant="outlined"></v-text-field>
+                                <v-text-field label="duration" v-model.number="duration" variant="outlined"></v-text-field>
+                                <div class="d-flex justify-space-around ma-4">
+                                    <v-btn color="green" @click="modifyEvt">Modify event</v-btn>
+                                    <v-btn color="red" @click="closeall">cancel</v-btn>
+                                </div>
+                            </div>
+                        </v-card>
+                    </v-dialog>
 
 
-                    </v-sheet>
-                </v-col>
 
-                <v-col cols="1" style="min-width: 100px; max-width: 100%;" class="flex-grow-1 flex-shrink-0">
-                    <v-btn :disabled="!showcompleted" @click="showcompleted = !showcompleted" color="#69F0AE" class="mx-3" :append-icon="showcompleted==true?'':'mdi-check-circle'" width="160px">Upcoming</v-btn><v-btn width="160px" :disabled="showcompleted" @click="showcompleted=!showcompleted" color="#69F0AE" :append-icon="showcompleted == false ? '' : 'mdi-check-circle'">completed</v-btn>
-                    <v-sheet class="ma-2 pa-2 board" elevation="6" width="600" >
-                        <div v-for="meet in sortFunc()" :key="meet.id">
+
+                </v-sheet>
+
+                <v-col cols="1" style="min-width: 100px; max-width: 60%; " class="flex-grow-1 flex-shrink-0">
+                    <div style="background-color: gray; margin-top:10px; padding-top:12px; padding-bottom:12px;">
+                        
+                        <v-btn :disabled="!showcompleted" @click="showcompleted = !showcompleted" color="white" class="mx-3"
+                        :variant="showcompleted == true ? 'outlined' : 'text'" width="160px">Upcoming</v-btn>
+                        <v-btn max-width="160px" :disabled="showcompleted" @click="showcompleted = !showcompleted" color="white"
+                        :variant="showcompleted == true ? 'text' : 'outlined'">completed</v-btn>
+                    </div>
+
+                    <v-sheet width="600" style="background-color: gray; padding-top:1px;">
+                        <div v-for="meet in sortFunc()" :key="meet.id" style="background-color:gray;">
 
                             <!-- <v-card > -->
-                            <v-card v-show="meet.showIt && toShow(meet) && toShowbyname(meet)  && toShowByCalender(meet) && (showcompleted==false? toShowbydate(meet) : showbeforedate(meet))" class="ma-5" style="max-width:100%" outlined color="#BBDEFB" variant="elevated" >
-                                <v-card-item >
+                            <v-card
+                                v-show="meet.showIt && toShow(meet) && toShowbyname(meet) && toShowByCalender(meet) && (showcompleted == false ? toShowbydate(meet) : showbeforedate(meet))"
+                                class="ma-5 board" elevation="6" style="max-width:100% " outlined color="black"
+                                variant="elevated">
+                                <v-card-item>
                                     <div>
                                         <div class="text-h6 mb-1">
-                                            <span class="font-weight-bold">Title:</span>
+                                            <span class="font-weight-bold" style="color:#FFD700">Title:</span>
                                             {{ meet.title }}
                                         </div>
                                         <div>
-                                            <span class="font-weight-bold">Date:</span>
+                                            <span class="font-weight-bold" style="color:#FFD700">Date:</span>
                                             {{ meet.date }}
                                         </div>
-                        
-                                        <div class><span class="font-weight-bold">Starting time:</span> {{ printTime(meet.start) }},&nbsp; <span class="font-weight-bold">Ending
-                                            time: </span>{{ printTime(meet.end) }}</div>
-                                        <div class="text-subtitle-1"><span class="font-weight-bold">Participants: </span>{{ printnames(meet.users) }}</div>
-                                    </div>
-                                </v-card-item>
 
-                                <v-card-actions>
-                                    <v-btn color="#00897B" variant="elevated" @click="modifyDialog(meet)">
-                                        Modify
+                                        <div class><span class="font-weight-bold" style="color:#FFD700">Starting
+                                                time:</span> {{ printTime(meet.start) }}
+                                        </div>
+                                        <div>
+                                            <span class="font-weight-bold" style="color:#FFD700">Ending
+                                                time: </span>{{ printTime(meet.end) }}
+                                        </div>
+                                        <div class="text-subtitle-1"><span class="font-weight-bold"
+                                                style="color:#FFD700">Participants: </span>{{ printnames(meet.users) }}
+                                        </div>
+                                    </div>
+
+                                    <v-btn color="green" variant="outlined" @click="modifyDialog(meet)">
+                                        Modify event
                                     </v-btn>
-                                    
-                                    <v-btn color="primary" variant="elevated" @click="deleteEvt(meet)">
-                                        Delete
+
+                                    <v-btn color="green" variant="outlined" class="mx-4" @click="deleteEvt(meet)">
+                                        Delete event
                                     </v-btn>
-                                </v-card-actions>
+                                </v-card-item>
+                                <!-- </v-card-actions> -->
                             </v-card>
 
                             <!-- </v-card> -->
@@ -150,11 +173,9 @@
                 </v-col>
 
             </v-sheet>
-            <v-sheet class="cal" width="500">
-
+            <v-sheet class="cal" width="500" style="background-color: black;">
                 <calenDar />
             </v-sheet>
-            <div type="date"></div>
         </v-sheet>
     </div>
 </template>
@@ -166,7 +187,7 @@ import { setupFirebase } from "../../composables/firebasesetup.js";
 
 import calenDar from "./calendar.vue";
 
-import {provide} from 'vue'
+import { provide } from 'vue'
 
 
 
@@ -239,18 +260,18 @@ export default {
         const showdate = ref(null);
         const heading = ref(null);
         let id = 0;
-        const modifydialog=ref(false);
+        const modifydialog = ref(false);
         let currdate = "2023-08-11";
         let dateStr = ref(null);
         provide('dateStr', dateStr)
         const userSort = ref([]);
-        let oldmeet,newmeet;
-        const showcompleted=ref(false)
+        let oldmeet, newmeet;
+        const showcompleted = ref(false)
 
-        async function modifyEvt(){
-            
+        async function modifyEvt() {
+
             deleteEvt(oldmeet);
-            if(await addEvt()==true){
+            if (await addEvt() == true) {
                 return;
             }
             heading.value = oldmeet.title;
@@ -264,20 +285,20 @@ export default {
             return;
         }
 
-        function modifyDialog(meet){
-            modifydialog.value=true;
-            heading.value=meet.title;
+        function modifyDialog(meet) {
+            modifydialog.value = true;
+            heading.value = meet.title;
             console.log(meet.users);
-            userAdded.value=meet.users;
-            date.value=meet.date;
-            duration.value=meet.end-meet.start;
-            startTime.value= fetchTime(meet.start);
-            oldmeet={
-                title:meet.title,
-                users:meet.users,
-                start:meet.start,
-                end:meet.end,
-                date:meet.date,
+            userAdded.value = meet.users;
+            date.value = meet.date;
+            duration.value = meet.end - meet.start;
+            startTime.value = fetchTime(meet.start);
+            oldmeet = {
+                title: meet.title,
+                users: meet.users,
+                start: meet.start,
+                end: meet.end,
+                date: meet.date,
             }
         }
 
@@ -285,13 +306,13 @@ export default {
 
         function addtoSort(use) {
             for (let i = 0; i < userSort.value.length; i++) {
-                if (userSort.value[i].name == use && userSort.value[i].variant=='tonal') {
-                    userSort.value[i].variant='outlined';
-                    userSort.value[i].color='#00C853';
-                    userSort.value[i].icon=""
-                    for(let j=0;j<showbyname.value.length;j++){
-                        if(showbyname.value[j]==use){
-                            showbyname.value.splice(j,1);
+                if (userSort.value[i].name == use && userSort.value[i].variant == 'outlined') {
+                    userSort.value[i].variant = 'tonal';
+                    userSort.value[i].color = '#00C853';
+                    userSort.value[i].icon = ""
+                    for (let j = 0; j < showbyname.value.length; j++) {
+                        if (showbyname.value[j] == use) {
+                            showbyname.value.splice(j, 1);
                             // console.log(showbyname.value);
                             return;
                         }
@@ -299,10 +320,10 @@ export default {
                     return;
                     // userSort.value.name
                 }
-                else if(userSort.value[i].name == use){
-                    userSort.value[i].variant = 'tonal';
-                    userSort.value[i].color='blue';
-                    userSort.value[i].icon="mdi-check"
+                else if (userSort.value[i].name == use) {
+                    userSort.value[i].variant = 'outlined';
+                    userSort.value[i].color = '#00C853';
+                    userSort.value[i].icon = ""
                     showbyname.value.push(use);
                     // console.log(showbyname.value);
                     return;
@@ -311,14 +332,14 @@ export default {
         }
 
         await getDocs(added_users)
-            .then((snap)=>{
-                snap.docs.forEach((doc)=>{
+            .then((snap) => {
+                snap.docs.forEach((doc) => {
                     users_added.value.push(doc.id);
                     userSort.value.push({
-                        name:doc.id,
-                        variant:'outlined',
-                        color:'#00C853',
-                        icon:""
+                        name: doc.id,
+                        variant: 'tonal',
+                        color: '#00C853',
+                        icon: ""
                     })
                 })
             })
@@ -342,12 +363,12 @@ export default {
             });
         }
 
-        function getDocID(date, start, end, users){
-            let Id="";
-            Id=date+'-'+start+'-'+end;
+        function getDocID(date, start, end, users) {
+            let Id = "";
+            Id = date + '-' + start + '-' + end;
 
-            users.forEach((u)=>{
-                Id=Id+'-'+u;
+            users.forEach((u) => {
+                Id = Id + '-' + u;
             })
 
             return Id;
@@ -356,7 +377,7 @@ export default {
 
         async function addEvt() {
             let count = 0;
-            start.value=getTime(startTime.value);
+            start.value = getTime(startTime.value);
             userAdded.value.sort();
             await getDocs(added_users).then((snapshot) => {
                 snapshot.docs.forEach((doc) => {
@@ -414,9 +435,9 @@ export default {
                             break;
                         }
                     }
-                    
-                    if (s!=1500) {
-                        if(start.value > s && 1500 - s > end - start.value)
+
+                    if (s != 1500) {
+                        if (start.value > s && 1500 - s > end - start.value)
                             count += 1;
                     }
                 }
@@ -424,8 +445,8 @@ export default {
                     for (let i = 0; i < userAdded.value.length; i++) {
                         const uname = doc(added_users, userAdded.value[i]);
                         const datewise = collection(uname, "date");
-                        const docid=getDocID(date.value, start.value, end, userAdded.value);
-                        const idwise=doc(datewise,docid)
+                        const docid = getDocID(date.value, start.value, end, userAdded.value);
+                        const idwise = doc(datewise, docid)
                         setDoc(idwise, {
                             users: userAdded.value,
                             start: start.value,
@@ -433,19 +454,19 @@ export default {
                             date: date.value,
                             title: heading.value,
                         })
-                        .then(() => {
-                            all_meetings.value.push({
-                                start:start.value,
-                                end:end,
-                                date:date.value,
-                                users:userAdded.value,
-                                title:heading.value,
-                                showIt: true,
-                                id:docid,
-                            })
-                            userAdded.value = [];
-                            start.value = null;
-                            duration.value = null;
+                            .then(() => {
+                                all_meetings.value.push({
+                                    start: start.value,
+                                    end: end,
+                                    date: date.value,
+                                    users: userAdded.value,
+                                    title: heading.value,
+                                    showIt: true,
+                                    id: docid,
+                                })
+                                userAdded.value = [];
+                                start.value = null;
+                                duration.value = null;
                                 date.value = "";
                                 dialog.value = false;
                                 heading.value = "";
@@ -457,7 +478,7 @@ export default {
                                 console.log("failure in adding");
                                 return Promise.resolve(false);
                             });
-                        }
+                    }
                     // console.log("yes", count, start, end, userAdded, date, duration);
                 } else {
                     console.log("failure due to unavailability of time");
@@ -465,7 +486,7 @@ export default {
                 }
             }
         }
-        
+
         function checkNotEmpty(intervals) {
             for (let i = 0; i < intervals.length; i++) {
                 if (intervals[i].empty()) {
@@ -474,7 +495,7 @@ export default {
             }
             return true;
         }
-        
+
         function Deque(intervals, f) {
             for (let i = 0; i < intervals.length; i++) {
                 while (!intervals[i].empty() && intervals[i].peek().start < f) {
@@ -491,7 +512,7 @@ export default {
             }
             return;
         }
-        
+
         async function suggestEvt() {
             //   const q= new Queue();
             //   const q1= new Queue();
@@ -501,11 +522,11 @@ export default {
             //   arr.push(q);
             //   arr.push(q1);
             //   console.log(arr);
-            varStart.value= getTime(slotStart.value)
-            varEnd.value= getTime(slotEnd.value)
+            varStart.value = getTime(slotStart.value)
+            varEnd.value = getTime(slotEnd.value)
             // console.log(varStart.value + "to" + varEnd.value)
 
-            if(varEnd.value <= varStart.value){
+            if (varEnd.value <= varStart.value) {
                 return;
             }
 
@@ -535,23 +556,23 @@ export default {
                 });
                 // console.log(inter);
 
-            //     // function 
-            for(let i = 0; i < inter.length; i++){
-                if(inter[i].end < varStart.value || inter[i].start > varEnd.value ){
-                    inter.splice(i, 1);
-                }
-                else if(inter[i].start < varStart.value && inter[i].end > varStart.value){
-                    inter.start = Math.max(varStart.value, inter.start);
-                    inter.end = Math.min(varEnd.value, inter.end)
+                //     // function 
+                for (let i = 0; i < inter.length; i++) {
+                    if (inter[i].end < varStart.value || inter[i].start > varEnd.value) {
+                        inter.splice(i, 1);
+                    }
+                    else if (inter[i].start < varStart.value && inter[i].end > varStart.value) {
+                        inter.start = Math.max(varStart.value, inter.start);
+                        inter.end = Math.min(varEnd.value, inter.end)
+                    }
+
+                    else if (inter[i].start < varEnd.value && inter[i].end > varEnd.value) {
+                        inter.start = Math.max(varStart.value, inter.start);
+                        inter.end = Math.min(varEnd.value, inter.end)
+                    }
                 }
 
-                else if(inter[i].start < varEnd.value && inter[i].end > varEnd.value){
-                    inter.start = Math.max(varStart.value, inter.start);
-                    inter.end = Math.min(varEnd.value, inter.end)
-                }
-            }
-
-            // console.log(inter)
+                // console.log(inter)
 
                 let s = varStart.value
                 const q = new Queue();
@@ -592,9 +613,9 @@ export default {
 
                 if (lmin - fmax >= duration.value) {
                     start.value = fmax;
-                    startTime.value=fetchTime(fmax);
+                    startTime.value = fetchTime(fmax);
                     // console.log("founded time "+startTime.value)
-                    
+
                     addEvt();
                     return;
                 }
@@ -644,24 +665,24 @@ export default {
                 // console.log(all_meetings.value);
             }
 
-        },(error)=>{
-            console.log("not captured",error);
+        }, (error) => {
+            console.log("not captured", error);
         })
 
         function toShowbyname(meet) {
-            if(showbyname.value.length==0){
+            if (showbyname.value.length == 0) {
                 return true;
             }
             // console.log(showbyname);
             let count = 0;
-            for(let i=0;i<showbyname.value.length;i++){
-                for(let j=0;j<meet.users.length;j++){
-                    if(showbyname.value[i]==meet.users[j]){
+            for (let i = 0; i < showbyname.value.length; i++) {
+                for (let j = 0; j < meet.users.length; j++) {
+                    if (showbyname.value[i] == meet.users[j]) {
                         count++;
                     }
                 }
             }
-            if(count == showbyname.value.length){
+            if (count == showbyname.value.length) {
                 return true;
             }
             return false;
@@ -669,16 +690,16 @@ export default {
 
         var today = new Date();
         // console.log(today);
-        currdate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        currdate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         var currtime = today.getHours() + ":" + today.getMinutes();
         // making currdate in proper format to compare
-                if(currdate[5] != '0' && currdate[6] == '-'){
+        if (currdate[5] != '0' && currdate[6] == '-') {
             currdate = currdate.split('');
             currdate.splice(5, 0, '0');
             currdate = currdate.join('');
         }
 
-        if(currdate[8] != '0' && currdate.length == 9){
+        if (currdate[8] != '0' && currdate.length == 9) {
             currdate = currdate.split('');
             currdate.splice(8, 0, '0');
             currdate = currdate.join('');
@@ -692,7 +713,7 @@ export default {
             // console.log(fetchTime(meet.start));
             // console.log(currdate);
             if ((meet.date == currdate && fetchTime(meet.start) > currtime) || (meet.date > currdate)) {
-                    return true;
+                return true;
             }
             else {
                 return false;
@@ -718,23 +739,23 @@ export default {
             // console.log("selection: : "+selection.value);
             // console.log("datestr: : "+dateStr.value + " " + typeof(dateStr));
             // console.log("meet date: : "+meet.date.toString() + typeof(meet.date));
-        //     // currdate = new Date();
-        //     console.log(fetchTime(meet.start));
+            //     // currdate = new Date();
+            //     console.log(fetchTime(meet.start));
             // console.log("in calender function filter",meet.date);
             // let s = meet.date.toString();
-            if(dateStr.value == null)
+            if (dateStr.value == null)
                 return true;
             if (dateStr.value != null && meet.date == dateStr.value) {
-                    return true;
+                return true;
             }
-             else if(dateStr.value != null && meet.date != dateStr.value){
+            else if (dateStr.value != null && meet.date != dateStr.value) {
                 return false;
             }
         }
 
 
         function printnames(users) {
-            if(users.length==0){
+            if (users.length == 0) {
                 return "undefined";
             }
             let names = users[0][0].toUpperCase() + users[0].slice(1);
@@ -746,7 +767,7 @@ export default {
 
         function printTime(time) {
             let min = time % 60;
-            let hr = Math.floor(time /60);
+            let hr = Math.floor(time / 60);
             let newhr, newmin;
             if (min < 10) {
                 newmin = '0' + min;
@@ -764,7 +785,7 @@ export default {
 
                 return newhr + ":" + newmin + " AM"
             }
-            if(hr!=12)
+            if (hr != 12)
                 hr -= 12;
             if (hr < 10) {
                 newhr = '0' + hr;
@@ -777,7 +798,7 @@ export default {
 
         function fetchTime(time) {
             let min = time % 60;
-            let hr = Math.floor(time /60);
+            let hr = Math.floor(time / 60);
             let newhr = hr;
             let newmin = min;
             return newhr + ":" + newmin;
@@ -785,16 +806,16 @@ export default {
 
 
         function getTime(time) {
-            if(time==null){
+            if (time == null) {
                 return null;
             }
-                let hr=parseInt(time.slice(0,2));
-                let min=parseInt(time.slice(3,5));
-                return hr*60+min;
+            let hr = parseInt(time.slice(0, 2));
+            let min = parseInt(time.slice(3, 5));
+            return hr * 60 + min;
         }
 
-        function toShow(meet){
-            if(meet.date == undefined || meet.start == undefined || meet.end == undefined || meet.users == undefined || meet.date == null || meet.start == null || meet.end == null || meet.users == null||meet.date=="" || meet.start == "" || meet.end=="" || meet.users==[]){
+        function toShow(meet) {
+            if (meet.date == undefined || meet.start == undefined || meet.end == undefined || meet.users == undefined || meet.date == null || meet.start == null || meet.end == null || meet.users == null || meet.date == "" || meet.start == "" || meet.end == "" || meet.users == []) {
                 return false;
             }
             // console.log(meet);
@@ -802,31 +823,44 @@ export default {
 
         }
 
-        function deleteEvt(meet){
+        function deleteEvt(meet) {
             console.log(meet);
-            let docid= getDocID(meet.date, meet.start, meet.end, meet.users);
+            let docid = getDocID(meet.date, meet.start, meet.end, meet.users);
             console.log(docid);
-            meet.users.forEach((user)=>{
-                const u=doc(added_users,user);
-                const d=collection(u,"date");
-                const deldoc=doc(d,docid);
+            meet.users.forEach((user) => {
+                const u = doc(added_users, user);
+                const d = collection(u, "date");
+                const deldoc = doc(d, docid);
                 deleteDoc(deldoc);
                 //console.log(deldoc);
             })
-            all_meetings.value.forEach((m)=>{
-                if(m.id==docid){
-                    m.showIt=false;
+            all_meetings.value.forEach((m) => {
+                if (m.id == docid) {
+                    m.showIt = false;
                 }
             })
         }
 
-        function showbeforedate(meet){
+        function showbeforedate(meet) {
             if (!((meet.date == currdate && fetchTime(meet.start) > currtime) || (meet.date > currdate))) {
-                    return true;
+                return true;
             }
             else {
                 return false;
             }
+        }
+
+        function closeall(){
+            dialog.value=false;
+            modifydialog.value=false;
+            suggestDialog.value=false;
+            heading.value="";
+            userAdded.value=[];
+            startTime.value="";
+            date.value="";
+            duration.value="";
+            slotStart.value="";
+            slotEnd.value="";
         }
 
         return {
@@ -867,61 +901,62 @@ export default {
             showbeforedate,
             slotEnd,
             slotStart,
+            closeall,
         };
     },
     methods: {
         sortFunc() {
             // console.log(this.showcompleted)
-            if(this.showcompleted==true){
+            if (this.showcompleted == true) {
                 return this.all_meetings.slice().sort(function (a, b) {
-                if(a.date == undefined || a.start == undefined || a.end == undefined || a.users == undefined || a.date == null || a.start == null || a.end == null || a.users == null||a.date=="" || a.start == "" || a.end=="" || a.users==[]){
-                    return -1;
-                }
-                if (b.date == undefined || b.start == undefined || b.end == undefined || b.users == undefined || b.date == null || b.start == null || b.end == null || b.users == null || b.date == "" || b.start == "" || b.end == "" || b.users == []) {
+                    if (a.date == undefined || a.start == undefined || a.end == undefined || a.users == undefined || a.date == null || a.start == null || a.end == null || a.users == null || a.date == "" || a.start == "" || a.end == "" || a.users == []) {
                         return -1;
-                }
-                    
-                if(a.date==b.date){
-                    if(a.start==b.start){
-                        a.end < b.end ? 1 : -1;
                     }
-                    else{
-                        return a.start < b.start ? 1 : -1;
-                    }
-                }
-                else{
-                    
-                    return a.date<b.date? 1:-1;
-                }
-            }); 
-        }
-        else{
-            return this.all_meetings.slice().sort(function (a, b) {
-                // console.log(a,b);
-                if(a.date == undefined || a.start == undefined || a.end == undefined || a.users == undefined || a.date == null || a.start == null || a.end == null || a.users == null||a.date=="" || a.start == "" || a.end=="" || a.users==[]){
-                    return -1;
-                }
-                if (b.date == undefined || b.start == undefined || b.end == undefined || b.users == undefined || b.date == null || b.start == null || b.end == null || b.users == null || b.date == "" || b.start == "" || b.end == "" || b.users == []) {
+                    if (b.date == undefined || b.start == undefined || b.end == undefined || b.users == undefined || b.date == null || b.start == null || b.end == null || b.users == null || b.date == "" || b.start == "" || b.end == "" || b.users == []) {
                         return -1;
-                }
-                    
-                if(a.date==b.date){
-                    if(a.start==b.start){
-                        a.end > b.end ? 1 : -1;
                     }
-                    else{
-                        return a.start > b.start ? 1 : -1;
-                    }
-                }
-                else{
-                    
-                    return a.date>b.date? 1:-1;
-                }
-            });
-        }
 
+                    if (a.date == b.date) {
+                        if (a.start == b.start) {
+                            a.end < b.end ? 1 : -1;
+                        }
+                        else {
+                            return a.start < b.start ? 1 : -1;
+                        }
+                    }
+                    else {
+
+                        return a.date < b.date ? 1 : -1;
+                    }
+                });
+            }
+            else {
+                return this.all_meetings.slice().sort(function (a, b) {
+                    // console.log(a,b);
+                    if (a.date == undefined || a.start == undefined || a.end == undefined || a.users == undefined || a.date == null || a.start == null || a.end == null || a.users == null || a.date == "" || a.start == "" || a.end == "" || a.users == []) {
+                        return -1;
+                    }
+                    if (b.date == undefined || b.start == undefined || b.end == undefined || b.users == undefined || b.date == null || b.start == null || b.end == null || b.users == null || b.date == "" || b.start == "" || b.end == "" || b.users == []) {
+                        return -1;
+                    }
+
+                    if (a.date == b.date) {
+                        if (a.start == b.start) {
+                            a.end > b.end ? 1 : -1;
+                        }
+                        else {
+                            return a.start > b.start ? 1 : -1;
+                        }
+                    }
+                    else {
+
+                        return a.date > b.date ? 1 : -1;
+                    }
+                });
+            }
+
+        },
     },
-},
     data() {
         return {
             users: ["krsna", "prabhupada", "chaitanya mahaprabhu"],
@@ -945,40 +980,68 @@ export default {
 <style scoped>
 .bord {
     width: 200px;
-    margin: 15px;
+    margin: 25px;
     /* margin-top:; */
-    border: thin solid black;
-    padding: 2px;
+    border: thin solid white;
+    padding: 8px;
+    background: black;
+    color: white;
 }
 
 .button {
     justify-content: center;
-    min-width: 95%;
+    min-width: 98%;
 
 }
-.cal{
-    margin-top: 100px;
+
+.cal {
+    padding-top: 100px;
+    background-color: black;
 }
 
-.board{
-    border: 1.5px solid black;
+
+.board {
+    border: 1.5px solid green;
 }
 
-.userhead{
-    background-color: #FFD54F;
+.userhead {
+    /* background-color: #FFD54F; */
+    color: #FFD700;
 }
 
-.timeSlot{
+.timeSlot {
     border: 1.5px solid black;
     /* display: inline-block; */
 
 
 
 }
-.start-end{
-    width:42%;
+
+.start-end {
+    width: 190px;
     margin-left: 10px;
     margin-right: 10px;
     display: inline-block;
 }
-</style>
+
+
+.bordered-div {
+    position: relative;
+    border: 0.2px solid #000;
+    padding-top: 30px;
+    padding-left: 15px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* Use the :before pseudo-element selector */
+.bordered-div::before {
+    content: "Time Slot";
+    position: absolute;
+    top: -12px;
+    left: 12%;
+    transform: translateX(-50%);
+    background-color: rgb(221, 216, 216);
+    padding: 0 8px;
+    /* border: 0.5px solid #000; */
+}</style>

@@ -1,7 +1,10 @@
 <template>
     <v-app>
-        <toolBar />
-        <addEventButton />
+        <div style="background-color: black; height:100vh; width: 100vw; ">
+
+            <toolBar />
+            <addEventButton />
+        </div>
     </v-app>
 </template>
 

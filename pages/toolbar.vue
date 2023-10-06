@@ -1,8 +1,8 @@
 <template>
     <div>
         <nav>
-            <v-toolbar app color="indigo" dark>
-                <v-toolbar-title class="font-weight-bold" >
+            <v-toolbar app color="#757575" >
+                <v-toolbar-title class="font-weight-bold" style="color:white">
                     <v-icon icon="mdi-calendar" ></v-icon>
                     Meeting Scheduler
                 </v-toolbar-title>

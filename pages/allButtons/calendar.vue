@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <v-card width="320px" elevation="12">
+    <div style="background-color: black;">
+        <v-card  elevation="12"  style="background-color: black;">
 
-            <div class="calendar">
+            <div class="calendar" >
                 <div class="calendar-header">
                     <!-- <span class="month-picker" id="month-picker">{{ month }}</span> -->
                     <div class="year-picker">
@@ -199,7 +199,7 @@ export default {
     align-items: center;
     font-size: 20px;
     font-weight: 600;
-    color: var(--color-txt);
+    color: orange;
     padding: 5px;
 }
 
@@ -217,19 +217,19 @@ export default {
 .calendar-week-day div {
     display: grid;
     place-items: center;
-    color: var(--bg-second);
+    color: orange;
 }
 
 .calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 2px;
-    color: var(--color-txt);
+    color: green;
 }
 
 .calendar-days div {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -402,28 +402,31 @@ export default {
 }
 
 .black {
-    color: white;
+    color: orange;
     font: bold;
-    border: 1px solid black;
-    background-color: grey;
+    border: 1px solid white;
+    background-color: green;
     border-radius: 50%;
 }
 
 
 .white {
-    color: black;
+    color: green;
 }
 
 .today {
     /* color:white;
     background-color:blue; */
-    border: 1px solid black;
+    border: 1px solid orange;
     border-radius: 50%;
 }
 
 .calendar {
     /* height: ; */
-    border: 1px solid black;
-    background-color: white;
+    margin-left:20px;
+    border: 1.5px solid white;
+    background-color: black;
+    width:325px;
+    height:290px
 }
 </style>
